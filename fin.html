@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Vega-Lite Visualization</title>
+  <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .vis-container {
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="vis-container" id="vis"></div>
+  </div>
+
+  <script>
+    const spec = {
+      "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+      "data": {
+        "url": "assign.json",
+        "format": {
+            "property": "SalesOrders"
+          }
+        
+      },
+      "title" : "Visualization of HW_III data",
+      "spacing": 10,
+      "concat": [
+        {
+          "title": "Donut Chart: Rep vs Total",
+          "mark": {"type": "arc", "innerRadius": 50},
+          "encoding": {
+            "theta": {"field": "Total", "type": "quantitative"},
+            "color": {"field": "Rep", "type": "nominal"},
+            "tooltip": [
+              {"field": "Rep", "type": "nominal"},
+              {"field": "Total", "type": "quantitative"}
+            ]
+            
+          },
+          "view": {"stroke": null},
+          "resolve": {"scale": {"color": "independent"}}
+          
+        },
+        {
+            "title": "Correlation between Units and Unit Cost with Rectangular Brush",
+            "selection": {"brush": {"type": "interval"}},
+            "mark": "point",
+            "encoding": {
+              "x": {"field": "Units", "type": "quantitative"},
+              "y": {"field": "Unit Cost", "type": "quantitative"},
+              "color": {
+                "condition": {
+                  "selection": "brush",
+                  "field": "Item",
+                  "type": "nominal"
+                },
+                "value": "grey"
+              },
+              "tooltip": [
+                {"field": "Units", "type": "quantitative"},
+                {"field": "Unit Cost", "type": "quantitative"}
+              ]
+              
+            },
+            "resolve": {"scale": {"color": "independent"}}
+        },
+        {
+            "title": "Streamgraph of Total over Time (Color by Item)",
+            "mark": "area",
+            "encoding": {
+              "x": {"field": "OrderDate", "type": "temporal"},
+              "y": {"field": "Total", "type": "quantitative", "stack": "center"},
+              "color": {"field": "Item", "type": "nominal"},
+              "tooltip": [
+                {"field": "Item", "type": "nominal"},
+                {"field": "Total", "type": "quantitative"}
+              ]
+              
+             
+            },
+            "resolve": {"scale": {"color": "independent"}}
+        },
+          
+        {
+          "title": "Histogram of Units with Global Mean Overlay",
+             "layer": [
+            {
+              "mark": "bar",
+              "encoding": {
+                "x": {"field": "Units", "type": "quantitative", "bin": true},
+                "y": {"aggregate": "count", "type": "quantitative"},
+                "color": {"field": "Item", "type": "nominal"},
+                "tooltip": [
+                  {"field": "Units", "type": "quantitative", "title": "Units"},
+                  {
+                    "field": "count",
+                    "type": "quantitative",
+                    "aggregate": "count",
+                    "title": "Count"
+                  }
+                ]
+              }
+            },
+            {
+              "mark": "rule",
+              "encoding": {
+                "x": {
+                  "field": "Units",
+                  "type": "quantitative",
+                  "aggregate": "mean"
+                },
+                "color": {"value": "red"},
+                "size": {"value": 2},
+                "tooltip": [
+                  {
+                    "field": "Units",
+                    "type": "quantitative",
+                    "aggregate": "mean",
+                    "title": "Mean Units"
+                  }
+                ]
+              }
+            }
+          ],
+          "resolve": {"scale": {"color": "independent"}}
+        }
+      ],
+      "resolve": {"scale": {"color": "independent"}}
+    };
+
+    vegaEmbed('#vis', spec);
+  </script>
+</body>
+</html>
